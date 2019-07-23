@@ -31,7 +31,7 @@ if __name__ == "__main__":
             i.update()
             done = i.naked_single()
             if not done: done = i.hidden_single()
-            printwhole(table)
+            #printwhole(table)
         print('koniec tury')
     
     printwhole(table)
