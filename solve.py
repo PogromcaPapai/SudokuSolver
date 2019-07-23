@@ -1,36 +1,43 @@
-from construct import Square, construct
+from const import Square, construct
 
 
 class Case(object):
 
+    ### Magic methods ###
+    def __init__(self, list, Square):
+        self.list = list
+        self.sq = Square
+        self.sq.case = self
+        self.update()
 
-def printrow(row, table):
-    text = ''
-    for i in range(9*row,9*row+9):
-        digit = str(table[i])
-        if digit == '0': digit = ' '
-        text+=digit
-    print(text)
+    def __len__(self):
+        return len(self.possible)
 
-def printwhole(table):
-    for i in range(9):
-        printrow(i, table)
-    print('\n')
+    ### Manipulation ###
+    def update(self):
+        """ Updates case's `possible` attribute """
+        self.possible = self.sq.row_rep.possible & self.sq.column_rep.possible & self.sq.field_rep.possible
 
-def end_check(table):
-    sum = 0
+    def final(self):
+        self.list.remove(self)
+        del self
+
+    ### Strategies ###
+
+    def naked_single(self):
+        if len(self)==1:
+            self.sq.value = self.possible.pop()
+            print('koniec')
+            self.sq.update()
+            self.final()
+            return True
+        else:
+            return False
+  
+        
+def env(table):
+    cases = []
     for i in table:
-        sum += i.get_value()
-    return sum==405
-
-
-'''
-def eval(self):
-    """Evaluates possible values and if possible changes it"""
-    if self.get_value()>0:
-        return None
-    possible = self.row_rep & self.column_rep & self.field_rep
-    if len(possible) == 1:
-        self.value = possible.pop()
-        print('Square',str(self.get_place()),'rozwiazane')
-'''
+        if i.get_value()==0:
+            cases.append(Case(cases, i))
+    return cases

@@ -1,4 +1,3 @@
-from time import perf_counter
 from functools import total_ordering
 from random import randint
 
@@ -51,19 +50,15 @@ class Square(object):
         self.field_rep = fields[self.field]
         self.field_rep.append(self)
         if val in ['1','2','3','4','5','6','7','8','9']:
-            self.value = val
+            self.value = int(val)
             self.update()
         elif val == ' ' or val == '.':
             self.value = 0
-            self.update()
         else:
             raise TypeError
 
     def __repr__(self):
         return str(self.value)
-
-    def __len__(self):
-        return len(self.possible)
 
     def __eq__(self, other):
         return len(self)==len(other)
@@ -74,14 +69,10 @@ class Square(object):
     ### Manipulation ###
 
     def update(self):
-        """ Updates regions and field's `possible` attribute """
-        if self.get_value()!=0:
-            self.row_rep.pop(self.get_value())
-            self.field_rep.pop(self.get_value())
-            self.column_rep.pop(self.get_value())
-            self.possible = {}
-        else:
-            self.possible = self.row_rep.possible & self.column_rep.possible & self.field_rep.possible
+        """ Updates regions `possible` attribute """
+        self.row_rep.pop(self.get_value())
+        self.field_rep.pop(self.get_value())
+        self.column_rep.pop(self.get_value())
 
     ### Movement ###
 
