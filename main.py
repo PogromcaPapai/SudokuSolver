@@ -30,7 +30,8 @@ if __name__ == "__main__":
         for i in cases:
             i.update()
             done = i.naked_single()
-            printwhole(table)
+            if not done: done = i.hidden_single()
+            #printwhole(table)
         print('koniec tury')
     
     printwhole(table)

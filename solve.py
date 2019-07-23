@@ -1,5 +1,5 @@
 from const import Square, construct
-
+from collections import Counter
 
 class Case(object):
 
@@ -27,13 +27,29 @@ class Case(object):
     def naked_single(self):
         if len(self)==1:
             self.sq.value = self.possible.pop()
-            print('koniec')
+            print('naked single')
             self.sq.update()
             self.final()
             return True
         else:
             return False
-  
+    
+    def hidden_single(self):
+        for i in [self.sq.row_rep, self.sq.column_rep, self.sq.field_rep]:
+            count = Counter()
+            for k in i:
+                try:
+                    count = count + Counter(k.case.possible)
+                except AttributeError:
+                    count = count + Counter([k.get_value()])
+            for j in self.possible:
+                if count[j]==1:
+                    self.sq.value = j
+                    print('hidden single')
+                    self.sq.update()
+                    self.final()
+                    return True
+        return False
         
 def env(table):
     cases = []

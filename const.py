@@ -52,7 +52,7 @@ class Square(object):
         if val in ['1','2','3','4','5','6','7','8','9']:
             self.value = int(val)
             self.update()
-        elif val == ' ' or val == '.':
+        elif val == ' ' or val == '-':
             self.value = 0
         else:
             raise TypeError
