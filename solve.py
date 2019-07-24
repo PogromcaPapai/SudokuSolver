@@ -9,8 +9,8 @@ class Case(object):
         self.list = list
         self.sq = Square
         self.sq.case = self
-        self.update()
         self.allowset = set()
+        self.update()
 
     def __len__(self):
         return len(self.possible)
