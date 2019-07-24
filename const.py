@@ -6,16 +6,17 @@ class Region(object):
     
     def __init__(self):
         self.possible = {1,2,3,4,5,6,7,8,9}
+        self.blocked = set()
         self.squares = []
 
     def __getitem__(self, num):
         return self.squares[num]
     
     def __len__(self):
-        return len(self.possible)
+        return len(self.touse())
     
     def __repr__(self):
-        return str(self.possible)
+        return str(self.touse())
     
     def append(self, object):
         self.squares.append(object)
@@ -23,8 +24,12 @@ class Region(object):
     def pop(self, number):
         self.possible.discard(number)
 
+    def block(self, it):
+        self.blocked.update(it)
+    
+    def touse(self, allow=set()):
+        return self.possible - (self.blocked - allow)
 
-@total_ordering
 class Square(object):
     """ Serves as a representation for a field """
     
@@ -51,6 +56,7 @@ class Square(object):
         if val in ['1','2','3','4','5','6','7','8','9']:
             self.value = int(val)
             self.update()
+            self.case = None
         elif val == ' ' or val == '-':
             self.value = 0
         else:
@@ -59,11 +65,6 @@ class Square(object):
     def __repr__(self):
         return str(self.value)
 
-    def __eq__(self, other):
-        return len(self)==len(other)
-    
-    def __le__(self, other):
-        return len(self)<=len(other)
 
     ### Manipulation ###
 

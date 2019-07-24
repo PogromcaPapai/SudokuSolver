@@ -10,19 +10,32 @@ class Case(object):
         self.sq = Square
         self.sq.case = self
         self.update()
+        self.allowset = set()
 
     def __len__(self):
         return len(self.possible)
 
+    def __eq__(self, other):
+        if type(self)==type(other):
+            return self.possible==other.possible
+        else:
+            return False
+
     ### Manipulation ###
     def update(self):
         """ Updates case's `possible` attribute """
-        self.possible = self.sq.row_rep.possible & self.sq.column_rep.possible & self.sq.field_rep.possible
+        self.possible = (self.sq.row_rep.touse(allow=self.allowset) & 
+                         self.sq.column_rep.touse(allow=self.allowset) & 
+                         self.sq.field_rep.touse(allow=self.allowset))
 
     def final(self):
         """ Deletes the object """
         self.list.remove(self)
+        self.sq.case = None
         del self
+
+    def allow(self, it):
+        self.allowset.update(it)
 
     ### Strategies ###
 
@@ -54,6 +67,30 @@ class Case(object):
                     self.final()
                     return True
         return False
+
+    def naked_pair(self):
+        """ Method implements the 'naked pair' strategy """   
+        if len(self)==2:
+            for i in set(self.sq.row_rep.squares+self.sq.column_rep.squares
+                         +self.sq.field_rep.squares):
+                if self==i.case and self.sq!=i:
+                    if i.field_rep == self.sq.field_rep:
+                        i.case.allow(self.possible)
+                        self.allow(self.possible)
+                        i.field_rep.block(self.possible)
+                    if i.row_rep == self.sq.row_rep:
+                        i.case.allow(self.possible)
+                        self.allow(self.possible)
+                        i.row_rep.block(self.possible)
+                    elif i.column_rep == self.sq.column_rep:
+                        i.case.allow(self.possible)
+                        self.allow(self.possible)
+                        i.column_rep.block(self.possible)
+                    print('naked pair')
+                    return True
+        return False
+
+
         
 def env(table):
     """ Creates a case object for every unsolved cell in table"""
