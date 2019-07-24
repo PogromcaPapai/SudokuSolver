@@ -6,7 +6,8 @@ Named in honor of my friend's grandmother.
 1. Run by starting `main.py`
 2. Enter the sudoku, in empty places write ` ` or `-`; at the end of every line just press enter
    For example:
-   ![An example image](/example.png)
+   ![An example image](/example.PNG)
+   
    should be represented as:
    ```
    42-3--7--
