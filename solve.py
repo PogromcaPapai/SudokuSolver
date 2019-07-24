@@ -2,6 +2,7 @@ from const import Square, construct
 from collections import Counter
 
 class Case(object):
+    """ Creates a representation for possible solutions """
 
     ### Magic methods ###
     def __init__(self, list, Square):
@@ -19,12 +20,14 @@ class Case(object):
         self.possible = self.sq.row_rep.possible & self.sq.column_rep.possible & self.sq.field_rep.possible
 
     def final(self):
+        """ Deletes the object """
         self.list.remove(self)
         del self
 
     ### Strategies ###
 
     def naked_single(self):
+        """ Method implements the 'naked single' strategy """
         if len(self)==1:
             self.sq.value = self.possible.pop()
             print('naked single')
@@ -35,6 +38,7 @@ class Case(object):
             return False
     
     def hidden_single(self):
+        """ Method implements the 'hidden single' strategy """
         for i in [self.sq.row_rep, self.sq.column_rep, self.sq.field_rep]:
             count = Counter()
             for k in i:
@@ -52,6 +56,7 @@ class Case(object):
         return False
         
 def env(table):
+    """ Creates a case object for every unsolved cell in table"""
     cases = []
     for i in table:
         if i.get_value()==0:

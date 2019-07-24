@@ -2,6 +2,7 @@ from functools import total_ordering
 from random import randint
 
 class Region(object):
+    """ Serves as a representation of a column, a row or a field """
     
     def __init__(self):
         self.possible = {1,2,3,4,5,6,7,8,9}
@@ -25,9 +26,7 @@ class Region(object):
 
 @total_ordering
 class Square(object):
-    """
-    Serves as a representation for a field
-    """
+    """ Serves as a representation for a field """
     
     ### Magic functions ###
     
@@ -35,9 +34,9 @@ class Square(object):
         """
         Creates a field
 
-        Parameters:
-            id (int) : key in the parent list
-            val (string) : value entered for a field (' ' or '.' for fields to solve)
+        Arguments:
+            id : int : key in the parent list
+            val : string : value entered for a field (' ' or '.' for fields to solve)
         """
         self.id = id
         self.row = id//9
@@ -77,32 +76,41 @@ class Square(object):
     ### Movement ###
 
     def right(self, distance = 1):
+        """ Returns a cell on the right of current cell """
         return self.row_rep[self.row+distance]
     
     def left(self, distance = 1):
+        """ Returns a cell on the left of current cell """
         return self.row_rep[self.row-distance]
 
     def up(self, distance = 1):
+        """ Returns a cell above the current cell """
         return self.column_rep[self.column-distance]
     
     def down(self, distance = 1):
+        """ Returns a cell under the current cell """
         return self.column_rep[self.column+distance]
 
     ### Get functions ###
 
     def get_value(self):
+        """ Returns the value of the cell """
         return self.value
-
-    def get_place(self):
-        return self.column, self.row, self.field
     
 def createfield():
+    """ Creates representations for columns, rows and fields """
     global columns; columns = [Region() for i in range(9)]
     global rows; rows = [Region() for i in range(9)]
     global fields; fields = [Region() for i in range(9)]
     
 
 def construct(test=False):
+    """
+    Returns a functioning representation of the playing field
+
+    `test=True` assigns random values
+    """
+    createfield()
     id = 0
     table = []
     if test==False:
@@ -119,5 +127,4 @@ def construct(test=False):
     return table
 
 if __name__ == '__main__':
-    createfield()
     table = construct()
