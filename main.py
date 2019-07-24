@@ -31,8 +31,8 @@ if __name__ == "__main__":
             i.update()
             done = i.naked_single()
             if not done: done = i.hidden_single()
-            #printwhole(table)
-        print('koniec tury')
+            if done: printwhole(table)
+        print('turn')
     
     printwhole(table)
     print('Solved in', str(round(perf_counter()-start,3)),'seconds')
