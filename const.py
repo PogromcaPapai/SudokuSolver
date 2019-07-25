@@ -28,7 +28,7 @@ class Region(object):
         self.used.add(number)
 
     def possible(self, allow=set()):
-        set(range(1,10)) - (self.used | (self.blocked - allow))
+        return set(range(1,10)) - (self.used | (self.blocked - allow))
 
 @total_ordering
 class Square(object):
