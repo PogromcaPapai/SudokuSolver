@@ -38,16 +38,25 @@ def end_check(table):
 
 if __name__ == "__main__":
     table = const.construct()
-    cases = solve.env(table)
+    stopped = False
     start = perf_counter() #Time measurement starts
+    cases = solve.env(table)
+    turn=0
     while end_check(table)==False:
+        turn += 1
         cases.sort(key=len)
         for i in cases:
             i.update()
+            i.naked_pair()
             done = i.naked_single()
             if not done: done = i.hidden_single()
-            if done: printwhole(table)
-        print('turn')
-    
+            #if done: printwhole(table)
+        if turn>=100: 
+            stopped=True
+            break
+    stop = perf_counter()
     printwhole(table)
-    print('Solved in', str(round(perf_counter()-start,3)),'seconds')
+    if not stopped: 
+        print('Solved in', str(round(stop-start,3)),'seconds')
+    else:
+        print('Not solved,', str(round(stop-start,3)),'seconds')
