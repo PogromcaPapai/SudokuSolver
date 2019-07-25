@@ -43,7 +43,7 @@ class Case(object):
         """ Method implements the 'naked single' strategy """
         if len(self)==1:
             self.sq.value = self.possible.pop()
-            print('naked single')
+            print('naked single', self.sq.row, self.sq.column)
             self.sq.update()
             self.final()
             return True
@@ -62,7 +62,7 @@ class Case(object):
             for j in self.possible:
                 if count[j]==1:
                     self.sq.value = j
-                    print('hidden single')
+                    print('hidden single', self.sq.row, self.sq.column)
                     self.sq.update()
                     self.final()
                     return True
@@ -86,7 +86,7 @@ class Case(object):
                         i.case.allow(self.possible)
                         self.allow(self.possible)
                         i.column_rep.block(self.possible)
-                    print('naked pair')
+                    print('naked pair', self.sq.row, self.sq.column, '|', i.row, i.column)
                     return True
         return False
 

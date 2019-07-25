@@ -49,7 +49,7 @@ if __name__ == "__main__":
             done = i.naked_pair()
             if not done: done = i.naked_single()
             if not done: done = i.hidden_single()
-            #if done: printwhole(table)
+            if done: printwhole(table)
         if turn>=1000: break
     stop = perf_counter()
     printwhole(table)
