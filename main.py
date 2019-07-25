@@ -46,8 +46,8 @@ if __name__ == "__main__":
         cases.sort(key=len)
         for i in cases:
             i.update()
-            done = i.naked_pair()
-            if not done: done = i.naked_single()
+            i.naked_pair()
+            done = i.naked_single()
             if not done: done = i.hidden_single()
             if done: printwhole(table)
         if turn>=1000: break
