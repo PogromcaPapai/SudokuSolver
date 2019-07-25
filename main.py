@@ -44,6 +44,7 @@ if __name__ == "__main__":
         cases.sort(key=len)
         for i in cases:
             i.update()
+            i.naked_pair()
             done = i.naked_single()
             if not done: done = i.hidden_single()
             if done: printwhole(table)

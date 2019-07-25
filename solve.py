@@ -9,6 +9,7 @@ class Case(object):
         self.list = list
         self.sq = Square
         self.sq.case = self
+        self.allowed = set()
         self.update()
 
     def __len__(self):
@@ -17,7 +18,12 @@ class Case(object):
     ### Manipulation ###
     def update(self):
         """ Updates case's `possible` attribute """
-        self.possible = self.sq.row_rep.possible() & self.sq.column_rep.possible() & self.sq.field_rep.possible()
+        self.possible = (self.sq.row_rep.possible(allow=self.allowed) 
+                         & self.sq.column_rep.possible(allow=self.allowed) 
+                         & self.sq.field_rep.possible(allow=self.allowed))
+
+    def allow(self,it):
+        self.allowed.update(it)
 
     def final(self):
         """ Deletes the object """
@@ -54,7 +60,33 @@ class Case(object):
                     self.final()
                     return True
         return False
-        
+
+    def naked_pair(self):
+        """ Method implements the 'naked pair' strategy """   
+        if len(self)==2:
+            checked = self.sq.row_rep.squares+self.sq.column_rep.squares+self.sq.field_rep.squares
+            for i in set(checked):
+                if i.case != None and self.possible==i.case.possible and self.sq!=i:
+                    if i.field_rep == self.sq.field_rep:
+                        i.case.allow(self.possible)
+                        self.allow(self.possible)
+                        i.field_rep.block(self.possible)
+                    if i.row_rep == self.sq.row_rep:
+                        i.case.allow(self.possible)
+                        self.allow(self.possible)
+                        i.row_rep.block(self.possible)
+                    elif i.column_rep == self.sq.column_rep:
+                        i.case.allow(self.possible)
+                        self.allow(self.possible)
+                        i.column_rep.block(self.possible)
+                    print('naked pair', self.sq.row, self.sq.column, '|', i.row, i.column)
+                    self.update()
+                    i.case.update()
+                    return None
+        return None
+
+
+
 def env(table):
     """ Creates a case object for every unsolved cell in table"""
     cases = []

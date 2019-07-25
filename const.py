@@ -22,7 +22,7 @@ class Region(object):
         self.squares.append(object)
     
     def block(self, it):
-        self.blocked.add()
+        self.blocked.update(it)
 
     def addused(self, number):
         self.used.add(number)
@@ -30,7 +30,6 @@ class Region(object):
     def possible(self, allow=set()):
         return set(range(1,10)) - (self.used | (self.blocked - allow))
 
-@total_ordering
 class Square(object):
     """ Serves as a representation for a field """
     
@@ -56,6 +55,7 @@ class Square(object):
         self.field_rep.append(self)
         if val in ['1','2','3','4','5','6','7','8','9']:
             self.value = int(val)
+            self.case = None
             self.update()
         elif val == ' ' or val == '-':
             self.value = 0
@@ -64,12 +64,6 @@ class Square(object):
 
     def __repr__(self):
         return str(self.value)
-
-    def __eq__(self, other):
-        return len(self)==len(other)
-    
-    def __le__(self, other):
-        return len(self)<=len(other)
 
     ### Manipulation ###
 
