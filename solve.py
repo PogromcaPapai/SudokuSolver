@@ -15,6 +15,12 @@ class Case(object):
     def __len__(self):
         return len(self.possible)
 
+    def __eq__(self, other):
+        if type(self)==type(other):
+            return self.possible==other.possible
+        else:
+            return False
+
     ### Manipulation ###
     def update(self):
         """ Updates case's `possible` attribute """
@@ -25,10 +31,15 @@ class Case(object):
     def allow(self,it):
         self.allowed.update(it)
 
+
     def final(self):
         """ Deletes the object """
         self.list.remove(self)
+        self.sq.case = None
         del self
+
+    def allow(self, it):
+        self.allowset.update(it)
 
     ### Strategies ###
 
@@ -36,7 +47,7 @@ class Case(object):
         """ Method implements the 'naked single' strategy """
         if len(self)==1:
             self.sq.value = self.possible.pop()
-            print('naked single')
+            print('naked single', self.sq.row, self.sq.column)
             self.sq.update()
             self.final()
             return True
@@ -55,7 +66,7 @@ class Case(object):
             for j in self.possible:
                 if count[j]==1:
                     self.sq.value = j
-                    print('hidden single')
+                    print('hidden single', self.sq.row, self.sq.column)
                     self.sq.update()
                     self.final()
                     return True
@@ -84,8 +95,6 @@ class Case(object):
                     i.case.update()
                     return None
         return None
-
-
 
 def env(table):
     """ Creates a case object for every unsolved cell in table"""

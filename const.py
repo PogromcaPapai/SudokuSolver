@@ -29,6 +29,7 @@ class Region(object):
 
     def possible(self, allow=set()):
         return set(range(1,10)) - (self.used | (self.blocked - allow))
+      
 
 class Square(object):
     """ Serves as a representation for a field """
@@ -57,6 +58,7 @@ class Square(object):
             self.value = int(val)
             self.case = None
             self.update()
+            self.case = None
         elif val == ' ' or val == '-':
             self.value = 0
         else:
@@ -64,6 +66,7 @@ class Square(object):
 
     def __repr__(self):
         return str(self.value)
+
 
     ### Manipulation ###
 
