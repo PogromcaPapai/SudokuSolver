@@ -5,24 +5,30 @@ class Region(object):
     """ Serves as a representation of a column, a row or a field """
     
     def __init__(self):
-        self.possible = {1,2,3,4,5,6,7,8,9}
+        self.used = set()
+        self.blocked = set()
         self.squares = []
 
     def __getitem__(self, num):
         return self.squares[num]
     
     def __len__(self):
-        return len(self.possible)
+        return len(self.possible())
     
     def __repr__(self):
-        return str(self.possible)
+        return str(self.possible())
     
     def append(self, object):
         self.squares.append(object)
     
-    def pop(self, number):
-        self.possible.discard(number)
+    def block(self, it):
+        self.blocked.add()
 
+    def addused(self, number):
+        self.used.add(number)
+
+    def possible(self, allow=set()):
+        set(range(1,10)) - (self.used | (self.blocked - allow))
 
 @total_ordering
 class Square(object):
@@ -69,9 +75,9 @@ class Square(object):
 
     def update(self):
         """ Updates regions `possible` attribute """
-        self.row_rep.pop(self.get_value())
-        self.field_rep.pop(self.get_value())
-        self.column_rep.pop(self.get_value())
+        self.row_rep.addused(self.get_value())
+        self.field_rep.addused(self.get_value())
+        self.column_rep.addused(self.get_value())
 
     ### Movement ###
 

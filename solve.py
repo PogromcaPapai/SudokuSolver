@@ -17,7 +17,7 @@ class Case(object):
     ### Manipulation ###
     def update(self):
         """ Updates case's `possible` attribute """
-        self.possible = self.sq.row_rep.possible & self.sq.column_rep.possible & self.sq.field_rep.possible
+        self.possible = self.sq.row_rep.possible() & self.sq.column_rep.possible() & self.sq.field_rep.possible()
 
     def final(self):
         """ Deletes the object """
