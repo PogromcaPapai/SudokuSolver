@@ -15,12 +15,6 @@ class Case(object):
     def __len__(self):
         return len(self.possible)
 
-    def __eq__(self, other):
-        if type(self)==type(other):
-            return self.possible==other.possible
-        else:
-            return False
-
     ### Manipulation ###
     def update(self):
         """ Updates case's `possible` attribute """
@@ -37,9 +31,6 @@ class Case(object):
         self.list.remove(self)
         self.sq.case = None
         del self
-
-    def allow(self, it):
-        self.allowset.update(it)
 
     ### Strategies ###
 
