@@ -44,6 +44,7 @@ class Square(object):
             id : int : key in the parent list
             val : string : value entered for a field (' ' or '.' for fields to solve)
         """
+        self.case = None
         self.id = id
         self.row = id//9
         self.column = id - (self.row)*9
@@ -56,16 +57,14 @@ class Square(object):
         self.field_rep.append(self)
         if val in ['1','2','3','4','5','6','7','8','9']:
             self.value = int(val)
-            self.case = None
             self.update()
-            self.case = None
         elif val == ' ' or val == '-':
             self.value = 0
         else:
             raise TypeError
 
     def __repr__(self):
-        return str(self.value)
+        return f"{self.column}-{self.row}"
 
 
     ### Manipulation ###
@@ -98,7 +97,12 @@ class Square(object):
 
     def get_value(self):
         """ Returns the value of the cell """
-        return self.value
+        if self.value>0:
+            return self.value
+        elif self.case and self.case.assrt_lvl>0:
+            return self.case.assrt
+        else:
+            return 0
     
 def createfield():
     """ Creates representations for columns, rows and fields """

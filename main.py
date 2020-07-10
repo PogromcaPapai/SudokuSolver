@@ -14,7 +14,7 @@ def printrow(row, table):
     """
     text = ''
     for i in range(9*row,9*row+9):
-        digit = str(table[i])
+        digit = str(table[i].get_value())
         if digit == '0': digit = ' '
         text+=digit
     print(text)
@@ -38,25 +38,10 @@ def end_check(table):
 
 if __name__ == "__main__":
     table = const.construct()
-    stopped = False
     start = perf_counter() #Time measurement starts
     cases = solve.env(table)
-    turn=0
-    while end_check(table)==False:
-        turn += 1
-        cases.sort(key=len)
-        for i in cases:
-            i.update()
-            i.naked_pair()
-            done = i.naked_single()
-            if not done: done = i.hidden_single()
-            #if done: printwhole(table)
-        if turn>=100: 
-            stopped=True
-            break
+    solve.layer_solve(cases)
+    
     stop = perf_counter()
     printwhole(table)
-    if not stopped: 
-        print('Solved in', str(round(stop-start,3)),'seconds')
-    else:
-        print('Not solved,', str(round(stop-start,3)),'seconds')
+    print((not end_check(table))*"not",'solved in', str(round(stop-start,3)),'seconds')

@@ -1,19 +1,29 @@
 from const import Square, construct
 from collections import Counter
+from typing import List
+from functools import reduce
 
 class Case(object):
     """ Creates a representation for possible solutions """
 
     ### Magic methods ###
-    def __init__(self, list, Square):
-        self.list = list
+    def __init__(self, _list, Square):
+        self.list = _list
         self.sq = Square
         self.sq.case = self
         self.allowed = set()
+
+        # Tree-Consequence model
+        self.assrt = 0
+        self.assrt_lvl = 0
+
         self.update()
 
     def __len__(self):
         return len(self.possible)
+
+    def __str__(self):
+        return str(self.sq)
 
     ### Manipulation ###
     def update(self):
@@ -25,20 +35,26 @@ class Case(object):
     def allow(self,it):
         self.allowed.update(it)
 
-
     def final(self):
-        """ Deletes the object """
-        self.list.remove(self)
-        self.sq.case = None
-        del self
+        """ Deletes the object if it's not an assertion """
+        if self.assrt_lvl==-1:
+            self.list.remove(self)
+            self.sq.case = None
+
+    def set_val(self, val: int):
+        if self.assrt_lvl==0:
+            self.sq.value = val
+            self.assrt_lvl = -1
+        else:
+            self.assrt = val
 
     ### Strategies ###
 
     def naked_single(self):
         """ Method implements the 'naked single' strategy """
         if len(self)==1:
-            self.sq.value = self.possible.pop()
-            print('naked single', self.sq.row, self.sq.column)
+            self.set_val(self.possible.pop())
+            print('naked single', str(self))
             self.sq.update()
             self.final()
             return True
@@ -56,8 +72,8 @@ class Case(object):
                     count = count + Counter([k.get_value()])
             for j in self.possible:
                 if count[j]==1:
-                    self.sq.value = j
-                    print('hidden single', self.sq.row, self.sq.column)
+                    self.set_val(j)
+                    print('hidden single', str(self))
                     self.sq.update()
                     self.final()
                     return True
@@ -81,11 +97,61 @@ class Case(object):
                         i.case.allow(self.possible)
                         self.allow(self.possible)
                         i.column_rep.block(self.possible)
-                    print('naked pair', self.sq.row, self.sq.column, '|', i.row, i.column)
+                    print('naked pair', str(self), '|', str(i))
                     self.update()
                     i.case.update()
                     return None
         return None
+
+def gen_conseq(cases, lvl):
+    cases.sort(key=len)
+    is_change=True
+    while is_change:
+        is_change=False
+        for i in cases:
+            i.update()
+            # i.naked_pair()
+            done = i.naked_single()
+            if not done: done = i.hidden_single()
+            if done: i.assrt_lvl = lvl
+            is_change |= done
+            #if done: printwhole(table)
+
+def check_contra(cases: List[Case]) -> bool:
+    for i in cases:
+        if len(i.possible)==0:
+            print("Contradiction at", i)
+            return True 
+    return False
+
+def _layer(cases: List[Case], level: int) -> bool:
+    # Generate existing consequences     
+    gen_conseq(cases, level)
+    if check_contra(cases):
+        # Delete false assertion
+        for i in cases:
+            if i.assrt_lvl==level:
+                i.assrt_lvl = 0
+                i.assrt = 0
+        return False
+    elif len({ j for j in cases if j.assrt_lvl==0})==0:
+        # Write asserted values
+        for i in cases:
+            i.sq.value = i.assrt 
+        return True
+    else:
+        # Create assertion
+        nextassert = min({ j for j in cases if j.assrt_lvl==0}, key=len)
+        for i in nextassert.possible:
+            print(f"Assert {nextassert} <- {i}; level {level+1}")
+            nextassert.set_val(i)
+            nextassert.assrt_lvl = level+1
+            if _layer(cases, level+1):
+                return True
+        raise Exception("No possible value")
+
+def layer_solve(cases: List[Case]):
+    return _layer(cases, 0)
 
 def env(table):
     """ Creates a case object for every unsolved cell in table"""
