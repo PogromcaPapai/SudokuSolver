@@ -25,13 +25,18 @@ class Case(object):
 
     def __str__(self):
         return str(self.sq)
+    
+    def __repr__(self):
+        return str(self.sq)
 
     ### Manipulation ###
     def update(self):
         """ Updates case's `possible` attribute """
-        self.possible = (self.sq.row_rep.possible(allow=self.allowed) 
+        unused = (self.sq.row_rep.possible(allow=self.allowed) 
                          & self.sq.column_rep.possible(allow=self.allowed) 
                          & self.sq.field_rep.possible(allow=self.allowed))
+        self.possible = unused | ({self.sq.get_value()} - {0})
+        return self.possible
 
     def allow(self,it):
         self.allowed.update(it)
@@ -42,27 +47,29 @@ class Case(object):
             self.list.remove(self)
             self.sq.case = None
 
-    def set_val(self, val: int):
-        if self.assrt_lvl==0:
+    def set_val(self, val: int, lvl: int):
+        if lvl==0:
             self.sq.value = val
             self.assrt_lvl = -1
         else:
             self.assrt = val
+            self.assrt_lvl = lvl
 
     ### Strategies ###
 
-    def naked_single(self):
+    def naked_single(self, lvl: int):
         """ Method implements the 'naked single' strategy """
         if len(self)==1:
             val = self.possible.pop()
-            self.set_val(val)
-            print((self.assrt_lvl+1)*"\t",'naked single', str(self), "<-", val)
+            self.possible.add(val)
+            self.set_val(val, lvl)
+            print((self.assrt_lvl)*"\t", 'naked single', str(self), "<-", val)
             self.final()
             return True
         else:
             return False
     
-    def hidden_single(self):
+    def hidden_single(self, lvl: int):
         """ Method implements the 'hidden single' strategy """
         for i in [self.sq.row_rep, self.sq.column_rep, self.sq.field_rep]:
             count = Counter()
@@ -73,13 +80,13 @@ class Case(object):
                     count = count + Counter([k.get_value()])
             for j in self.possible:
                 if count[j]==1:
-                    self.set_val(j)
-                    print((self.assrt_lvl+1)*"\t",'hidden single', str(self), "<-", j)
+                    self.set_val(j, lvl)
+                    print((self.assrt_lvl)*"\t", 'hidden single', str(self), "<-", j)
                     self.final()
                     return True
         return False
 
-    def naked_pair(self):
+    def naked_pair(self, lvl: int):
         """ Method implements the 'naked pair' strategy """   
         if len(self)==2:
             checked = self.sq.row_rep.squares+self.sq.column_rep.squares+self.sq.field_rep.squares
@@ -97,11 +104,10 @@ class Case(object):
                         i.case.allow(self.possible)
                         self.allow(self.possible)
                         i.column_rep.block(self.possible)
-                    print((self.assrt_lvl+1)*"\t", 'naked pair', str(self), '|', str(i))
+                    print((self.assrt_lvl)*"\t", 'naked pair', str(self), '|', str(i))
                     self.update()
                     i.case.update()
                     return None
-        return None
 
 def gen_conseq(cases, lvl):
     cases.sort(key=len)
@@ -112,16 +118,14 @@ def gen_conseq(cases, lvl):
             if i.assrt==0:
                 i.update()
                 # i.naked_pair()
-                done = i.naked_single()
-                if not done: done = i.hidden_single()
-                if done: i.assrt_lvl = lvl
+                done = i.naked_single(lvl)
+                if not done: done = i.hidden_single(lvl)
                 is_change |= done
                 #if done: printwhole(table)
 
 def check_contra(cases: List[Case], level=0) -> bool:
     for i in cases:
-        i.update()
-        if len(i.possible)==0:
+        if len(i.update())==0:
             print(level*"\t", "Contradiction at", i)
             return True 
     return False
@@ -130,12 +134,7 @@ def _layer(cases: List[Case], level: int) -> bool:
     # Generate existing consequences     
     gen_conseq(cases, level)
     if check_contra(cases, level=level):
-        # Delete false assertion
-        for i in cases:
-            if i.assrt_lvl==level:
-                i.assrt_lvl = 0
-                i.assrt = 0
-            i.update()
+        # Delete false assertion and consequences
         return False
     elif len({ j for j in cases if j.assrt_lvl==0})==0:
         # Write asserted values
@@ -145,13 +144,19 @@ def _layer(cases: List[Case], level: int) -> bool:
     else:
         # Create assertion
         nextassert = min({ j for j in cases if j.assrt_lvl==0}, key=len)
-        for i in nextassert.possible:
-            print((nextassert.assrt_lvl+1)*"\t", f"Assert {nextassert} <- {i}; level {level+1}")
-            nextassert.set_val(i)
-            nextassert.assrt_lvl = level+1
+        for i in nextassert.possible.copy():
+            print(level*"\t", f"Assert {nextassert} <- {i}; level {level+1}")
+            nextassert.set_val(i, level+1)
             if _layer(cases, level+1):
                 return True
-        raise Exception("No possible value")
+            else:
+                for i in cases:
+                    if i.assrt_lvl>level:
+                        i.assrt_lvl = 0
+                        i.assrt = 0
+                for i in cases:
+                    i.update()
+        return False
 
 def layer_solve(cases: List[Case]):
     return _layer(cases, 0)

@@ -39,7 +39,7 @@ def end_check(table):
     return reduce(lambda x, y: x+y.get_value(), table, 0)==405
 
 if __name__ == "__main__":
-    table = const.construct(field=TABLE)
+    table = const.construct()
     start = perf_counter() #Time measurement starts
     cases = solve.env(table)
     solve.layer_solve(cases)
