@@ -4,6 +4,8 @@ from functools import reduce
 import const
 import solve
 
+TABLE = "32-5---1-\n-4--8-395\n---------\n2517--46-\n---------\n-36--9871\n---------\n712-4--3-\n-9---6-42"
+
 def printrow(row, table):
     """
     Prints a series of nine elements from a list
@@ -37,7 +39,7 @@ def end_check(table):
     return reduce(lambda x, y: x+y.get_value(), table, 0)==405
 
 if __name__ == "__main__":
-    table = const.construct()
+    table = const.construct(field=TABLE)
     start = perf_counter() #Time measurement starts
     cases = solve.env(table)
     solve.layer_solve(cases)

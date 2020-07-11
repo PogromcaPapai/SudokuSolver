@@ -12,6 +12,7 @@ class Case(object):
         self.sq = Square
         self.sq.case = self
         self.allowed = set()
+        self.possible = set(range(1,10))
 
         # Tree-Consequence model
         self.assrt = 0
@@ -53,9 +54,9 @@ class Case(object):
     def naked_single(self):
         """ Method implements the 'naked single' strategy """
         if len(self)==1:
-            self.set_val(self.possible.pop())
-            print('naked single', str(self))
-            self.sq.update()
+            val = self.possible.pop()
+            self.set_val(val)
+            print((self.assrt_lvl+1)*"\t",'naked single', str(self), "<-", val)
             self.final()
             return True
         else:
@@ -73,8 +74,7 @@ class Case(object):
             for j in self.possible:
                 if count[j]==1:
                     self.set_val(j)
-                    print('hidden single', str(self))
-                    self.sq.update()
+                    print((self.assrt_lvl+1)*"\t",'hidden single', str(self), "<-", j)
                     self.final()
                     return True
         return False
@@ -97,7 +97,7 @@ class Case(object):
                         i.case.allow(self.possible)
                         self.allow(self.possible)
                         i.column_rep.block(self.possible)
-                    print('naked pair', str(self), '|', str(i))
+                    print((self.assrt_lvl+1)*"\t", 'naked pair', str(self), '|', str(i))
                     self.update()
                     i.case.update()
                     return None
@@ -109,30 +109,33 @@ def gen_conseq(cases, lvl):
     while is_change:
         is_change=False
         for i in cases:
-            i.update()
-            # i.naked_pair()
-            done = i.naked_single()
-            if not done: done = i.hidden_single()
-            if done: i.assrt_lvl = lvl
-            is_change |= done
-            #if done: printwhole(table)
+            if i.assrt==0:
+                i.update()
+                # i.naked_pair()
+                done = i.naked_single()
+                if not done: done = i.hidden_single()
+                if done: i.assrt_lvl = lvl
+                is_change |= done
+                #if done: printwhole(table)
 
-def check_contra(cases: List[Case]) -> bool:
+def check_contra(cases: List[Case], level=0) -> bool:
     for i in cases:
+        i.update()
         if len(i.possible)==0:
-            print("Contradiction at", i)
+            print(level*"\t", "Contradiction at", i)
             return True 
     return False
 
 def _layer(cases: List[Case], level: int) -> bool:
     # Generate existing consequences     
     gen_conseq(cases, level)
-    if check_contra(cases):
+    if check_contra(cases, level=level):
         # Delete false assertion
         for i in cases:
             if i.assrt_lvl==level:
                 i.assrt_lvl = 0
                 i.assrt = 0
+            i.update()
         return False
     elif len({ j for j in cases if j.assrt_lvl==0})==0:
         # Write asserted values
@@ -143,7 +146,7 @@ def _layer(cases: List[Case], level: int) -> bool:
         # Create assertion
         nextassert = min({ j for j in cases if j.assrt_lvl==0}, key=len)
         for i in nextassert.possible:
-            print(f"Assert {nextassert} <- {i}; level {level+1}")
+            print((nextassert.assrt_lvl+1)*"\t", f"Assert {nextassert} <- {i}; level {level+1}")
             nextassert.set_val(i)
             nextassert.assrt_lvl = level+1
             if _layer(cases, level+1):
