@@ -4,6 +4,7 @@ from functools import reduce
 import const
 import solve
 
+
 def printrow(row, table):
     """
     Prints a series of nine elements from a list
@@ -13,11 +14,13 @@ def printrow(row, table):
         table : list : list of elements to print
     """
     text = ''
-    for i in range(9*row,9*row+9):
-        digit = str(table[i])
-        if digit == '0': digit = ' '
-        text+=digit
+    for i in range(9*row, 9*row+9):
+        digit = str(table[i].get_value())
+        if digit == '0':
+            digit = ' '
+        text += digit
     print(text)
+
 
 def printwhole(table):
     """
@@ -28,35 +31,24 @@ def printwhole(table):
     """
     for i in range(9):
         printrow(i, table)
-    print('----')
+
 
 def end_check(table):
     """
     Checks if all cells in the table are properly solved
     """
-    return reduce(lambda x, y: x+y.get_value(), table, 0)==405
+    return reduce(lambda x, y: x+y.get_value(), table, 0) == 405
+
 
 if __name__ == "__main__":
     table = const.construct()
-    stopped = False
-    start = perf_counter() #Time measurement starts
+    print('----')
+    start = perf_counter()  # Time measurement starts
     cases = solve.env(table)
-    turn=0
-    while end_check(table)==False:
-        turn += 1
-        cases.sort(key=len)
-        for i in cases:
-            i.update()
-            i.naked_pair()
-            done = i.naked_single()
-            if not done: done = i.hidden_single()
-            #if done: printwhole(table)
-        if turn>=100: 
-            stopped=True
-            break
+    solve.layer_solve(cases)
     stop = perf_counter()
+    print('----')
     printwhole(table)
-    if not stopped: 
-        print('Solved in', str(round(stop-start,3)),'seconds')
-    else:
-        print('Not solved,', str(round(stop-start,3)),'seconds')
+    print('----')
+    print((not end_check(table))*"not", 'solved in',
+          str(round(stop-start, 3)), 'seconds')
