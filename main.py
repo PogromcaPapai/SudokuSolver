@@ -4,7 +4,6 @@ from functools import reduce
 import const
 import solve
 
-TABLE = "32-5---1-\n-4--8-395\n---------\n2517--46-\n---------\n-36--9871\n---------\n712-4--3-\n-9---6-42"
 
 def printrow(row, table):
     """
@@ -15,11 +14,13 @@ def printrow(row, table):
         table : list : list of elements to print
     """
     text = ''
-    for i in range(9*row,9*row+9):
+    for i in range(9*row, 9*row+9):
         digit = str(table[i].get_value())
-        if digit == '0': digit = ' '
-        text+=digit
+        if digit == '0':
+            digit = ' '
+        text += digit
     print(text)
+
 
 def printwhole(table):
     """
@@ -30,20 +31,24 @@ def printwhole(table):
     """
     for i in range(9):
         printrow(i, table)
-    print('----')
+
 
 def end_check(table):
     """
     Checks if all cells in the table are properly solved
     """
-    return reduce(lambda x, y: x+y.get_value(), table, 0)==405
+    return reduce(lambda x, y: x+y.get_value(), table, 0) == 405
+
 
 if __name__ == "__main__":
     table = const.construct()
-    start = perf_counter() #Time measurement starts
+    print('----')
+    start = perf_counter()  # Time measurement starts
     cases = solve.env(table)
     solve.layer_solve(cases)
-    
     stop = perf_counter()
+    print('----')
     printwhole(table)
-    print((not end_check(table))*"not",'solved in', str(round(stop-start,3)),'seconds')
+    print('----')
+    print((not end_check(table))*"not", 'solved in',
+          str(round(stop-start, 3)), 'seconds')
