@@ -60,7 +60,7 @@ class Case(object):
             val = self.possible.pop()
             self.possible.add(val)
             self.set_val(val, lvl)
-            print((self.assrt_lvl)*"\t", 'naked single', str(self), "<-", val)
+            # print((self.assrt_lvl)*"\t", 'naked single', str(self), "<-", val)
             self.final()
             return True
         else:
@@ -78,8 +78,8 @@ class Case(object):
             for j in self.possible:
                 if count[j] == 1:
                     self.set_val(j, lvl)
-                    print((self.assrt_lvl)*"\t",
-                          'hidden single', str(self), "<-", j)
+                    # print((self.assrt_lvl)*"\t",
+                        #   'hidden single', str(self), "<-", j)
                     self.final()
                     return True
         return False
@@ -108,7 +108,7 @@ def check_contra(cases: List[Case], tab_level=0) -> bool:
     """ Checks case list for contradisctions """
     for i in cases:
         if len(i.update()) == 0:
-            print(tab_level*"\t", "Contradiction at", i)
+            # print(tab_level*"\t", "Contradiction at", i)
             return True
     return False
 
@@ -130,7 +130,7 @@ def _layer(cases: List[Case], level: int) -> bool:
         # Create assertion
         nextassert = min({j for j in cases if j.assrt_lvl == 0}, key=len)
         for i in nextassert.possible.copy():
-            print(level*"\t", f"Assert {nextassert} <- {i}; level {level+1}")
+            # print(level*"\t", f"Assert {nextassert} <- {i}; level {level+1}")
             nextassert.set_val(i, level+1)
             if _layer(cases, level+1):
                 return True

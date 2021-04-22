@@ -41,14 +41,19 @@ def end_check(table):
 
 
 if __name__ == "__main__":
-    table = const.construct()
-    print('----')
-    start = perf_counter()  # Time measurement starts
-    cases = solve.env(table)
-    solve.layer_solve(cases)
-    stop = perf_counter()
-    print('----')
-    printwhole(table)
-    print('----')
-    print((not end_check(table))*"not", 'solved in',
-          str(round(stop-start, 3)), 'seconds')
+    with open('real_examples.txt', 'r') as f:
+        sudokus = f.read().split('\n\n')
+    with open('wyniki.csv', 'w') as f:
+        f.write('iter;num;solve;time\n')
+        for n, i in enumerate(sudokus):        
+            for j in range(10):
+                table = const.construct(i)
+                # print('----')
+                start = perf_counter()  # Time measurement starts
+                cases = solve.env(table)
+                solve.layer_solve(cases)
+                stop = perf_counter()
+                # print('----')
+                # printwhole(table)
+                # print('----')
+                f.write(";".join((str(j), str(n), str(end_check(table)), str(stop-start), '\n')))
