@@ -134,13 +134,12 @@ def _layer(cases: List[Case], level: int) -> bool:
             nextassert.set_val(i, level+1)
             if _layer(cases, level+1):
                 return True
-            else:
-                for i in cases:
-                    if i.assrt_lvl > level:
-                        i.assrt_lvl = 0
-                        i.assrt = 0
-                for i in cases:
-                    i.update()
+            for i in cases:
+                if i.assrt_lvl > level:
+                    i.assrt_lvl = 0
+                    i.assrt = 0
+            for i in cases:
+                i.update()
         return False
 
 
@@ -153,8 +152,4 @@ def layer_solve(cases: List[Case]) -> bool:
 
 def env(table) -> List[Case]:
     """ Creates a case object for every unsolved cell in table"""
-    cases = []
-    for i in table:
-        if i.get_value() == 0:
-            cases.append(Case(cases, i))
-    return cases
+    return [Case(cases, i) for i in table if i.get_value() == 0]

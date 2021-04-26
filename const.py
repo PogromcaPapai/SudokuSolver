@@ -51,7 +51,7 @@ class Square(object):
         self.field_rep.append(self)
         if val in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
             self.value = int(val)
-        elif val == ' ' or val == '-':
+        elif val in [' ', '-']:
             self.value = 0
         else:
             raise TypeError
