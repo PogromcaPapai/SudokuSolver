@@ -149,7 +149,10 @@ def layer_solve(cases: List[Case]) -> bool:
 
 ### Misc ###
 
-
 def env(table) -> List[Case]:
     """ Creates a case object for every unsolved cell in table"""
-    return [Case(cases, i) for i in table if i.get_value() == 0]
+    cases = []
+    for i in table:
+        if i.get_value() == 0:
+            cases.append(Case(cases, i))
+    return cases
