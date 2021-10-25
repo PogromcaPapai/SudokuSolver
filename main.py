@@ -39,14 +39,18 @@ def end_check(table):
     """
     return reduce(lambda x, y: x+y.get_value(), table, 0) == 405
 
+# FILE = 'real_examples'
+FILE = 'other'
 
 if __name__ == "__main__":
-    with open('real_examples.txt', 'r') as f:
+    with open(FILE+'.txt', 'r') as f:
         sudokus = f.read().split('\n\n')
-    with open('wyniki.csv', 'w') as f:
+    with open(f'wyniki{FILE}.csv', 'w') as f:
         f.write('iter;num;solve;time\n')
-        for n, i in enumerate(sudokus):        
-            for j in range(10):
+        for n, i in enumerate(sudokus):
+            print(f"sudoku {n}")
+            for j in range(10**2):
+            # for j in range(1):
                 table = const.construct(i)
                 # print('----')
                 start = perf_counter()  # Time measurement starts
@@ -56,4 +60,5 @@ if __name__ == "__main__":
                 # print('----')
                 # printwhole(table)
                 # print('----')
+                print(f'\titeration {j} finished')
                 f.write(";".join((str(j), str(n), str(end_check(table)), str(stop-start), '\n')))
